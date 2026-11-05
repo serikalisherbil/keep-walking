@@ -51,3 +51,7 @@ Console.
 Do not commit login tokens, service-account keys, `.env` secrets, local database
 exports, or users' backups. The ignored `node_modules`, `dist`, and `.firebase`
 directories are generated files and can be recreated.
+
+## Money data
+
+The source backup includes the Money UI, calculation engine, transaction service and tests. Bank balances are entered manually; no bank account is connected. Actual Money records live in the existing per-user Firestore collections, not in GitHub. Use the app's Settings JSON export for a snapshot of loaded tasks, minimums and Money records, or Money → Transactions → Export CSV for a spreadsheet view.

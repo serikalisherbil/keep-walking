@@ -90,3 +90,27 @@ The new primary origin is `https://keepwalking.web.app`. Firebase Authentication
 Existing users sign in again with the same Google account on the new origin. Local sessions and service-worker caches belong to their individual origins. Installed Home Screen / Dock shortcuts need to be added from the new address. Source backup: `https://github.com/serikalisherbil/keep-walking` (private).
 
 Validation of the short address on 2026-11-06: both Hosting releases completed; Google sign-in on keepwalking.web.app loaded the existing account with its six open tasks and seven weekly minimums/results. Connecting Calendar loaded seven calendars and 23 visible events without console errors. All 14 domain/session tests and the production build passed. Firestore data and access rules were not modified by this address change. iPhone installation and mobile redirect behavior on the new origin remain a device check.
+
+## Money — 2026-11-06
+
+The fourth tab is a manual KZT money tracker with an orange/gold light/dark palette, coloured account/category cards, emoji icons, spending charts and period trends. Real users start with no accounts, balances, debts or transactions. The interactive preview has fictional sample money records.
+
+- Bank/cash accounts have editable names, icons, colours and opening balances. Opening balances are not income. Accounts can be archived when empty.
+- Income, expenses and transfers record amount, date/time, account, category/source and note. Amounts are stored as integer tiyn. Edits reverse the old effect before applying the new one; voiding preserves a recoverable historical record. A correction that restores money to an archived pocket reopens it.
+- Savings goals are separate pockets, excluded from Total balance. Funding/returning money is a transfer. Bought records an expense from the goal, keeps the purchase in history, and permits returning the remainder to an account.
+- Debts support lent/borrowed money, existing debts already included in opening balances, due dates, partial repayment and history. Loan/repayment flows affect account balances and debt remaining, separately from income/expense totals.
+- Start new period uses an explicit date/time, preserves balances/debts/savings, and copies the previous period's category limits. Date boundaries determine reports; edited historical transaction dates update the appropriate period. The initial start date is editable before a second period is created.
+- Regular payments support daily/weekly/monthly schedules, pausing and due status. An expense is written only after Mark paid. Deterministic occurrence IDs prevent duplicate payments. Reminders run while Money is open when in-app reminders are enabled; no background/closed-app push service has been added.
+- Search/filter by period, type and account; show/restore voided transactions; export the filtered list to CSV for spreadsheet apps. CSV text is quoted and protected against formula injection. Global Settings JSON export includes money records too; import/restore is still not implemented.
+
+Storage uses per-user collections moneyAccounts, moneyCategories, moneyEntries, moneyDebts, moneyPeriods, moneyRecurring and moneyMeta, under the existing users/{UID} path. No bank credentials or financial data are sent to Google Calendar. Existing owner/admin access in the Firebase Console still applies; records are not end-to-end encrypted.
+
+Money mutations use client Firestore transactions reading current referenced account, debt, entry and period documents. Concurrent-device writes retry against current balances. There is no single growing ledger document: records live in separate documents. The initial version loads the user's records into realtime subscriptions for reporting.
+
+Implementation: src/money.ts (types and pure reducer), src/money-service.ts (atomic persistence), src/MoneyView.tsx (UI), src/money.css (responsive themes), src/money-preview.ts (fictional preview only). The existing account-isolation rules already cover these private collections; no rules change is needed.
+
+Validation: 27 domain/session/money tests plus 7 Firestore emulator tests, including cross-user denial on every money collection, simultaneous expenses, competing excessive repayments and competing purchases from a single goal. Browser preview checks include creating a zero-balance account, expense edit/void, goal funding/purchase/remainder return, partial debt repayment, paid regular payment, manual period rollover with copied budgets, same-minute period boundaries, category customization, archival, reload persistence and CSV download. 390px light/dark layouts were checked for overflow and usable forms.
+
+Debt details can be edited without overwriting balances or repayments. Correcting an existing opening debt adjusts its remaining amount while preserving the amount already repaid; a loan recorded with a cash flow must be corrected through its original transaction.
+
+Deployment completed on 2026-11-06 to both Hosting sites. The final live build at keepwalking.web.app loaded the existing signed-in workspace with its six tasks and seven weekly goals, the Money tab with zero accounts/balances, and the eight expense categories plus five income sources. No browser console errors were recorded. No sample financial accounts or transactions were added to production. Real simultaneous edits from an iPhone and Mac remain a device check; concurrency was verified in the Firestore emulator.

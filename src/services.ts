@@ -1,3 +1,6 @@
+import { moneyPreview } from './money-preview';
+import { commitMoney } from './money-service';
+import { emptyMoney, moneyWrites, type MoneyAction, type MoneyRow } from './money';
 import { initializeApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, reauthenticateWithPopup, reauthenticateWithRedirect, signOut, type User } from 'firebase/auth';
 import { getFirestore, collection, doc, onSnapshot, setDoc, deleteDoc, runTransaction, writeBatch } from 'firebase/firestore';
@@ -46,6 +49,7 @@ export function disconnectCalendar() { calendarSession.clear(); }
 const clean = <T,>(value: T): T => JSON.parse(JSON.stringify(value));
 export interface Store {
   demo: boolean;
+  money: (action: MoneyAction) => Promise<void>;
   subscribe: (receive: (data: Data, pending: boolean) => void, error: (error: Error) => void) => () => void;
   save: (name: CollectionName, row: Row) => Promise<void>;
   remove: (name: CollectionName, id: string) => Promise<void>;
@@ -65,6 +69,7 @@ export async function cloudStore(user: User): Promise<Store> {
   });
   return {
     demo: false,
+    async money(action) { await commitMoney(db,user.uid,action); },
     subscribe(receive,error) {
       const data = emptyData(), ready = new Set<string>(), pending = new Map<string,boolean>();
       const unsubs = collections.map(name => onSnapshot(collection(db,'users',user.uid,name),{includeMetadataChanges:true},snapshot => {
@@ -116,10 +121,12 @@ export function demoStore(): Store {
     {...newTask(dateKey()),title:'Make room for a little progress',categoryId:'health',dueTime:'18:00'},
     {...newTask(shiftDate(dateKey(),1)),title:'Block out a focused study session',categoryId:'study'}];
   }
+  data={...emptyMoney(),...data};
+  if(!data.moneyMeta.length)Object.assign(data,moneyPreview());
   let listener: ((data: Data,pending:boolean)=>void)|null=null;
   function emit() { localStorage.setItem(key,JSON.stringify(data)); listener?.({...data},false); }
   function put(name:CollectionName,row:Row) { (data[name] as Row[]) = [...(data[name] as Row[]).filter(item=>item.id!==row.id),clean(row)]; }
-  return {demo:true,subscribe(receive) { listener=receive;receive({...data},false);return()=>{listener=null;}; },
+  return {demo:true,async money(action){for(const {name,row} of moneyWrites(data,action)){(data[name] as MoneyRow[])=[...(data[name] as MoneyRow[]).filter(item=>item.id!==row.id),row];}emit();},subscribe(receive) { listener=receive;receive({...data},false);return()=>{listener=null;}; },
     async save(name,row){put(name,row);emit();}, async saveMany(rows){rows.forEach(({name,row})=>put(name,row));emit();},
     async remove(name,id){(data[name] as Row[])=(data[name] as Row[]).filter(row=>row.id!==id);emit();},
     async syncTask(task,update){const current=data.tasks.find(t=>t.id===task.id);if(current){put('tasks',{...current,...update});emit();}},

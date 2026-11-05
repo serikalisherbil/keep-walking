@@ -1,3 +1,4 @@
+import { emptyMoney, moneyCollections, type MoneyData } from './money';
 import { addDays, addMonths, format, getDaysInMonth, parseISO, startOfWeek } from 'date-fns';
 
 export type GoalType = 'quantity' | 'time' | 'check';
@@ -17,11 +18,11 @@ export interface Plan extends GoalVersion {}
 export interface Log { id: string; goalId: string; date: string; value: number; note: string }
 export interface Slot { id: string; title: string; date: string; time: string; duration: number; goalId: string; google?: GoogleLink | null; reminder: number }
 export interface Preferences { id: string; theme: 'system' | 'light' | 'dark'; reminderMinutes: number; eveningTime: string; eveningEnabled: boolean; inAppReminders: boolean; defaultCalendarId: string; hiddenCalendarIds: string[] }
-export interface Data { categories: Category[]; tasks: Task[]; goals: Goal[]; versions: GoalVersion[]; plans: Plan[]; logs: Log[]; slots: Slot[]; preferences: Preferences[] }
+export interface Data extends MoneyData { categories: Category[]; tasks: Task[]; goals: Goal[]; versions: GoalVersion[]; plans: Plan[]; logs: Log[]; slots: Slot[]; preferences: Preferences[] }
 export type CollectionName = keyof Data;
 export type Row = Data[CollectionName][number];
-export const collections: CollectionName[] = ['categories', 'tasks', 'goals', 'versions', 'plans', 'logs', 'slots', 'preferences'];
-export const emptyData = (): Data => ({ categories: [], tasks: [], goals: [], versions: [], plans: [], logs: [], slots: [], preferences: [] });
+export const collections: CollectionName[] = ['categories', 'tasks', 'goals', 'versions', 'plans', 'logs', 'slots', 'preferences', ...moneyCollections];
+export const emptyData = (): Data => ({ ...emptyMoney(), categories: [], tasks: [], goals: [], versions: [], plans: [], logs: [], slots: [], preferences: [] });
 export const COLORS = ['#477968', '#8a78ab', '#cc965a', '#5d89ae', '#c8797c', '#879250'];
 export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 export const dateKey = (date: Date = new Date()) => format(date, 'yyyy-MM-dd');

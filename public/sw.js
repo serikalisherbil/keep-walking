@@ -1,4 +1,4 @@
-const CACHE = 'keep-walking-shell-v4';
+const CACHE = 'keep-walking-shell-v6';
 self.addEventListener('install', event => { event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(['/','/icon.svg','/manifest.webmanifest']))); self.skipWaiting(); });
 self.addEventListener('activate', event => { event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('keep-walking-shell-') && key !== CACHE).map(key => caches.delete(key))))); self.clients.claim(); });
 self.addEventListener('fetch', event => {

@@ -1,3 +1,5 @@
+import { commitMoney } from '../src/money-service';
+import { entryDraft } from '../src/money';
 import { after, before, test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
@@ -84,4 +86,32 @@ test('users cannot enumerate all accounts or all users’ tasks', async () => {
   await assertFails(getDocs(collectionGroup(db, 'tasks')));
   await assertFails(getDoc(doc(db, 'users', 'bob')));
   await assertFails(setDoc(doc(db, 'shared', 'public'), { data: 'no public collection' }));
+});
+
+test('concurrent money writes preserve both expenses and reject a second excessive debt repayment', async () => {
+  const first = environment.authenticatedContext('finance-user', claims('finance@example.com')).firestore();
+  const second = environment.authenticatedContext('finance-user', claims('finance@example.com')).firestore();
+  await commitMoney(first as any, 'finance-user', {kind:'init',at:Date.now()});
+  await commitMoney(first as any, 'finance-user', {kind:'account',row:{id:'bank',name:'Bank',kind:'account',icon:'💳',color:'#fff',opening:100000,balance:0,target:0,archived:false}});
+  await Promise.all([commitMoney(first as any,'finance-user',{kind:'entry',row:{...entryDraft(),id:'expense-a',amount:1019,from:'bank',categoryId:'expense-food'}}),commitMoney(second as any,'finance-user',{kind:'entry',row:{...entryDraft(),id:'expense-b',amount:2011,from:'bank',categoryId:'expense-food'}})]);
+  assert.equal((await getDoc(doc(first,'users','finance-user','moneyAccounts','bank'))).data()?.balance,96970);
+  await commitMoney(first as any,'finance-user',{kind:'entry',newDebt:{id:'loan',person:'Friend',direction:'lent',principal:10000,remaining:10000,accountId:'bank',due:'',note:''},row:{...entryDraft('loan'),id:'loan-entry',amount:10000,from:'bank',debtId:'loan'}});
+  const results = await Promise.allSettled([commitMoney(first as any,'finance-user',{kind:'entry',row:{...entryDraft('repayment'),id:'payment-a',amount:7000,from:'bank',debtId:'loan'}}),commitMoney(second as any,'finance-user',{kind:'entry',row:{...entryDraft('repayment'),id:'payment-b',amount:7000,from:'bank',debtId:'loan'}})]);
+  assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
+  assert.equal((await getDoc(doc(first,'users','finance-user','moneyDebts','loan'))).data()?.remaining,3000);
+  assert.equal((await getDoc(doc(first,'users','finance-user','moneyAccounts','bank'))).data()?.balance,93970);
+  await commitMoney(first as any,'finance-user',{kind:'debt-details',id:'loan',person:'Friend renamed',due:'2026-12-01',note:'Updated details'});
+  assert.equal((await getDoc(doc(first,'users','finance-user','moneyDebts','loan'))).data()?.remaining,3000);
+});
+
+test('two devices cannot post two different purchases from the same savings goal', async () => {
+  const first=environment.authenticatedContext('goal-user',claims('goal@example.com')).firestore();
+  const second=environment.authenticatedContext('goal-user',claims('goal@example.com')).firestore();
+  await commitMoney(first as any,'goal-user',{kind:'account',row:{id:'bank',name:'Bank',kind:'account',icon:'💳',color:'#fff',opening:100000,balance:0,target:0,archived:false}});
+  await commitMoney(first as any,'goal-user',{kind:'account',row:{id:'skates',name:'Skates',kind:'goal',icon:'⛸️',color:'#fff',opening:0,balance:0,target:100000,archived:false}});
+  await commitMoney(first as any,'goal-user',{kind:'entry',row:{...entryDraft('transfer'),id:'fund',amount:100000,from:'bank',to:'skates'}});
+  const results=await Promise.allSettled([commitMoney(first as any,'goal-user',{kind:'entry',row:{...entryDraft(),id:'buy-a',amount:40000,from:'skates',categoryId:'expense-shopping',purchase:true}}),commitMoney(second as any,'goal-user',{kind:'entry',row:{...entryDraft(),id:'buy-b',amount:40000,from:'skates',categoryId:'expense-shopping',purchase:true}})]);
+  assert.equal(results.filter(r=>r.status==='fulfilled').length,1);
+  assert.equal((await getDoc(doc(first,'users','goal-user','moneyAccounts','skates'))).data()?.balance,60000);
+  assert.equal((await getDocs(collection(first,'users','goal-user','moneyEntries'))).docs.filter(d=>d.data().purchase).length,1);
 });
