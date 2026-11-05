@@ -1,0 +1,128 @@
+/* Section palettes inherit through navigation, dialogs and mobile controls.
+   Weekly minimums keep the original green palette. */
+.app-shell[data-section=tasks] {
+  --bg: #f5f8ff;
+  --surface: #fff;
+  --soft: #eaf1fc;
+  --sidebar: #eef4fc;
+  --ink: #20324e;
+  --muted: #6c7e99;
+  --line: #dbe5f3;
+  --green: #2664b4;
+  --tint: #dfebfc;
+  --section-gradient: linear-gradient(115deg, #214f9a 0%, #327fc9 60%, #59a9d8 100%);
+  --section-wash: radial-gradient(ellipse at 95% 0%, #dceaff 0%, transparent 65%);
+}
+.app-shell[data-section=schedule] {
+  --bg: #fcf7fc;
+  --surface: #fff;
+  --soft: #f4eaf6;
+  --sidebar: #f6eff8;
+  --ink: #423049;
+  --muted: #8a7290;
+  --line: #eadceb;
+  --green: #9950a4;
+  --tint: #efdcf3;
+  --section-gradient: linear-gradient(115deg, #ba4786 0%, #9752b4 55%, #6655b1 100%);
+  --section-wash: radial-gradient(ellipse at 95% 0%, #f3dff1 0%, transparent 65%);
+}
+[data-theme=dark] .app-shell[data-section=tasks] {
+  --bg: #141f30;
+  --surface: #1b2a40;
+  --soft: #243650;
+  --sidebar: #172538;
+  --ink: #e1ecfb;
+  --muted: #9cafca;
+  --line: #304360;
+  --green: #93c2ff;
+  --tint: #2b456b;
+  --section-gradient: linear-gradient(115deg, #234779 0%, #2c649d 60%, #357d9e 100%);
+  --section-wash: radial-gradient(ellipse at 95% 0%, #253d60 0%, transparent 65%);
+}
+[data-theme=dark] .app-shell[data-section=schedule] {
+  --bg: #241b2c;
+  --surface: #302238;
+  --soft: #3b2b46;
+  --sidebar: #2a1f32;
+  --ink: #f2e4f5;
+  --muted: #bca3c4;
+  --line: #4c3656;
+  --green: #d6a2e3;
+  --tint: #51365f;
+  --section-gradient: linear-gradient(115deg, #883967 0%, #74418e 55%, #504486 100%);
+  --section-wash: radial-gradient(ellipse at 95% 0%, #4a2a4e 0%, transparent 65%);
+}
+.app-shell:is([data-section=tasks], [data-section=schedule]) {
+  background: var(--section-wash), var(--bg);
+  color: var(--ink);
+}
+.app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading {
+  background: var(--section-gradient);
+  color: #fff;
+  border: 1px solid #ffffff24;
+  border-radius: 20px;
+  padding: 30px;
+  min-height: 178px;
+  box-shadow: 0 12px 35px color-mix(in srgb, var(--green) 10%, transparent);
+  flex-wrap: wrap;
+}
+.app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading h1 { color: #fff; }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading h1 span { color: #ffffffa8; }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading p,
+.app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading .eyebrow { color: #fffffff0; }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading .inline { margin-left: auto; }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .primary,
+.app-shell:is([data-section=tasks], [data-section=schedule]) .brand-mark,
+.app-shell:is([data-section=tasks], [data-section=schedule]) .toast {
+  background: var(--section-gradient);
+  color: #fff;
+}
+.app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading .primary {
+  background: #fff;
+  color: #31486e;
+  border: 1px solid #fff;
+}
+.app-shell[data-section=schedule] .page-heading .primary { color: #774287; }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading .secondary {
+  background: #ffffff16;
+  border-color: #ffffff70;
+  color: #fff;
+}
+.app-shell:is([data-section=tasks], [data-section=schedule]) .nav-button.active {
+  background: var(--tint);
+  color: var(--green);
+}
+.app-shell:is([data-section=tasks], [data-section=schedule]) .nav-button small { background: var(--surface); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .little-note { background: var(--soft); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .little-note p,
+.app-shell:is([data-section=tasks], [data-section=schedule]) .brand-period,
+.app-shell:is([data-section=tasks], [data-section=schedule]) .note-star,
+.app-shell:is([data-section=tasks], [data-section=schedule]) .add-task-row { color: var(--green); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .little-note small,
+.app-shell:is([data-section=tasks], [data-section=schedule]) .sidebar-caption { color: var(--muted); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .avatar { background: var(--tint); color: var(--green); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .quote-card { border-color: var(--line); color: var(--green); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .quote-card p,
+.app-shell:is([data-section=tasks], [data-section=schedule]) .quote-card strong { color: var(--muted); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) .theme-options .selected { border-color: var(--green); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) :is(button, a, summary):focus-visible { outline-color: var(--green); }
+.app-shell:is([data-section=tasks], [data-section=schedule]) :is(input, select, textarea):focus {
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--green) 15%, transparent);
+}
+.app-shell[data-section=schedule] .calendar-day.current-day > header { background: var(--soft) !important; }
+.app-shell[data-section=schedule] .current-day > header > strong { background: var(--tint); color: var(--green); }
+.app-shell[data-section=schedule] .free-space span { color: var(--muted); }
+.app-shell[data-section=schedule] .free-space button { color: var(--green); }
+.app-shell[data-section=schedule] .month-date.today { background: var(--section-gradient); }
+@media (max-width: 760px) {
+  .app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading {
+    padding: 23px 20px;
+    border-radius: 17px;
+    gap: 21px;
+    min-height: 0;
+  }
+  .app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading h1 { font-size: 28px; }
+  .app-shell:is([data-section=tasks], [data-section=schedule]) .page-heading .inline { margin-left: 0; }
+  .app-shell:is([data-section=tasks], [data-section=schedule]) .bottom-nav .nav-button.active { background: transparent; }
+}

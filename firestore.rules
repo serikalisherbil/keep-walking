@@ -1,0 +1,16 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isGoogleUser() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.firebase.sign_in_provider == 'google.com';
+    }
+
+    match /users/{userId}/{document=**} {
+      // The authenticated UID, never a client-supplied field, owns this workspace.
+      allow read, write: if isGoogleUser() && request.auth.uid == userId;
+    }
+  }
+}
