@@ -6,7 +6,7 @@ import { createCalendarSession } from './calendar-session';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyAdGDoQYLC_oGwx5vyUq7K2spSVRthG4-Q',
-  authDomain: location.hostname === 'keepwalk-2433b.web.app' ? 'keepwalk-2433b.web.app' : 'keepwalk-2433b.firebaseapp.com',
+  authDomain: ['keepwalking.web.app', 'keepwalk-2433b.web.app'].includes(location.hostname) ? location.hostname : 'keepwalk-2433b.firebaseapp.com',
   projectId: 'keepwalk-2433b', storageBucket: 'keepwalk-2433b.firebasestorage.app',
   messagingSenderId: '527121584625', appId: '1:527121584625:web:b7ab59626a59aa3f9c7450',
 };

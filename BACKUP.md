@@ -1,5 +1,8 @@
 # Restoring Keep Walking
 
+GitHub backup: https://github.com/serikalisherbil/keep-walking (private).
+Primary site: https://keepwalking.web.app
+
 This repository contains the complete application source, icons, dependency lockfile,
 Firebase Hosting configuration, Firestore access rules, and tests.
 User records live separately in Cloud Firestore; Google Calendar events remain in
@@ -31,6 +34,8 @@ npx --package firebase-tools@15.33.0 firebase login
 npm run build
 npx --package firebase-tools@15.33.0 firebase deploy --only hosting --project keepwalk-2433b
 ```
+
+The Hosting configuration publishes to both `keepwalking` (the primary address) and `keepwalk-2433b` (the original address), in the same Firebase project.
 
 Deploy `firestore:rules` separately when intentionally changing access rules.
 The existing project must remain available; source files do not recreate its

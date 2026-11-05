@@ -20,7 +20,7 @@ npm run build
 
 ## Publish to the existing Firebase project
 
-Project: `keepwalk-2433b`. Hosting URL: `https://keepwalk-2433b.web.app`.
+Project: `keepwalk-2433b`. Primary Hosting URL: `https://keepwalking.web.app`. The original `https://keepwalk-2433b.web.app` is also served from the same build and database.
 
 Initial version deployed on 2026-10-12. The live sign-in screen loads successfully. An unauthenticated Firestore read was rejected with HTTP 403 / PERMISSION_DENIED.
 
@@ -80,3 +80,13 @@ FIREBASE_EMULATORS_PATH=../../work/firebase-emulators ../../work/firebase-cli/no
 The owner reported a successful real second-account sign-in on 2026-11-06: the other user could sign in and did not see the owner’s tasks or minimums. Emulator tests separately verify database isolation.
 
 Deployment completed on 2026-11-06: Hosting and Firestore Rules both released successfully. The production app loaded the existing account and records without console errors; the alternate Firebase Hosting domain showed the new public sign-in screen. The owner subsequently confirmed successful sign-in from a friend’s Google account, with a separate workspace.
+
+## Short Hosting address — 2026-11-06
+
+The additional Hosting site `keepwalking` belongs to the original Firebase project `keepwalk-2433b`. Both Hosting entries in `firebase.json` publish the same `dist` build. Run `firebase deploy --only hosting --project keepwalk-2433b` to update both sites. The original site remains available.
+
+The new primary origin is `https://keepwalking.web.app`. Firebase Authentication authorizes `keepwalking.web.app`. The existing OAuth web client includes `https://keepwalking.web.app` as a JavaScript origin and `https://keepwalking.web.app/__/auth/handler` as a redirect URI. Google permissions, Firebase project ID, app ID, database, and per-user UID paths remain the same. The frontend uses its current Hosting origin as `authDomain` on both supported `.web.app` addresses, including mobile redirect flows.
+
+Existing users sign in again with the same Google account on the new origin. Local sessions and service-worker caches belong to their individual origins. Installed Home Screen / Dock shortcuts need to be added from the new address. Source backup: `https://github.com/serikalisherbil/keep-walking` (private).
+
+Validation of the short address on 2026-11-06: both Hosting releases completed; Google sign-in on keepwalking.web.app loaded the existing account with its six open tasks and seven weekly minimums/results. Connecting Calendar loaded seven calendars and 23 visible events without console errors. All 14 domain/session tests and the production build passed. Firestore data and access rules were not modified by this address change. iPhone installation and mobile redirect behavior on the new origin remain a device check.
